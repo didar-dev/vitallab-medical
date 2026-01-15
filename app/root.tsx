@@ -49,7 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen h-full">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -65,13 +65,11 @@ export default function App() {
       <main className="min-h-screen">
         <Outlet />
       </main>
-      <footer className="bg-gray-50 border-t border-gray-200 mt-auto flex flex-row items-center justify-center">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-4 py-4">
-          <p className="text-center text-gray-600 text-sm">
-            © {new Date().getFullYear()} VitalLab Medical. All rights reserved.
-          </p>
-        </div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-4 py-4 text-center">
+      <footer className="bg-gray-50 border-t border-gray-200 flex flex-row items-center justify-between">
+        <p className="text-gray-600 text-sm">
+          © {new Date().getFullYear()} VitalLab Medical. All rights reserved.
+        </p>
+        <p className="text-gray-600 text-sm">
           Developed by{" "}
           <a
             href="https://www.didar.dev/"
@@ -79,7 +77,7 @@ export default function App() {
           >
             Didar.dev
           </a>
-        </div>
+        </p>
       </footer>
     </>
   );
