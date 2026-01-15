@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { Navbar } from "./components/Navbar";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -32,7 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="flex flex-col min-h-screen">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -42,7 +43,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen">
+        <Outlet />
+      </main>
+      <footer className="bg-gray-50 border-t border-gray-200 mt-auto flex flex-row items-center justify-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-4 py-4">
+          <p className="text-center text-gray-600 text-sm">
+            © {new Date().getFullYear()} VitalLab Medical. All rights reserved.
+          </p>
+        </div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-4 py-4 text-center">
+          Developed by{" "}
+          <a
+            href="https://www.didar.dev/"
+            className="text-blue-600 hover:text-blue-700"
+          >
+            Didar.dev
+          </a>
+        </div>
+      </footer>
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
