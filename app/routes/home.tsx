@@ -22,10 +22,10 @@ export default function Home() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
-        className=" text-white py-20"
+        className="container h-[50vh] w-[95%] lg:w-full mx-auto px-4 sm:px-6 lg:px-8 rounded-2xl mt-5 text-white py-20"
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
+        <div className="container h-full mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl h-full mx-auto text-center flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl lg:text-5xl font-bold mb-6">
               Welcome to VitalLab Medical
             </h1>
