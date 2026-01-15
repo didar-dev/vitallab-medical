@@ -50,7 +50,7 @@ export function Navbar() {
             {/* Desktop Navigation */}
             <ul className="hidden md:flex space-x-4 lg:space-x-8" role="list">
               {pages.map((page) => (
-                <li>
+                <li key={page.path}>
                   <Link
                     to={page.path}
                     className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -88,6 +88,7 @@ export function Navbar() {
                     to={page.path}
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     onClick={closeMenu}
+                    key={page.path}
                   >
                     {page.name}
                   </Link>
