@@ -1,9 +1,19 @@
 import { Link } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -25,8 +35,13 @@ export function Navbar() {
   ];
 
   return (
-    <header>
-      <nav className="bg-white" aria-label="Main navigation">
+    <header className="sticky top-0 z-50">
+      <nav
+        className={`bg-white transition-shadow duration-300 ${
+          isScrolled ? "border-b border-gray-200 shadow-md" : ""
+        }`}
+        aria-label="Main navigation"
+      >
         <div className="container mx-auto">
           <div className="flex justify-between items-center h-16">
             <div className="shrink-0">
