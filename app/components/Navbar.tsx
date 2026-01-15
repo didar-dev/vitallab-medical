@@ -39,7 +39,11 @@ export function Navbar() {
                 aria-label="Home page"
                 onClick={closeMenu}
               >
-                VitalLab Medical
+                <img
+                  src="/logo.jpg"
+                  alt="VitalLab Medical"
+                  className="h-16 lg:h-20 object-contain"
+                />
               </Link>
             </div>
 
