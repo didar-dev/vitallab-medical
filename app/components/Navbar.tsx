@@ -26,11 +26,8 @@ export function Navbar() {
 
   return (
     <header>
-      <nav
-        className="bg-white shadow-sm border-b border-gray-200"
-        aria-label="Main navigation"
-      >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-white" aria-label="Main navigation">
+        <div className="container mx-auto">
           <div className="flex justify-between items-center h-16">
             <div className="shrink-0">
               <Link
@@ -42,7 +39,7 @@ export function Navbar() {
                 <img
                   src="/logo.jpg"
                   alt="VitalLab Medical"
-                  className="h-16 lg:h-20 object-contain"
+                  className="h-16 lg:h-16 object-contain"
                 />
               </Link>
             </div>
@@ -53,7 +50,7 @@ export function Navbar() {
                 <li key={page.path}>
                   <Link
                     to={page.path}
-                    className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="nav-link text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors focus:outline-none"
                   >
                     {page.name}
                   </Link>
@@ -64,7 +61,7 @@ export function Navbar() {
             {/* Mobile Menu Button */}
             <button
               type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
               aria-controls="mobile-menu"
               aria-expanded={isMenuOpen}
               aria-label="Toggle navigation menu"
@@ -86,7 +83,7 @@ export function Navbar() {
                 {pages.map((page) => (
                   <Link
                     to={page.path}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="nav-link block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors focus:outline-none"
                     onClick={closeMenu}
                     key={page.path}
                   >
