@@ -65,15 +65,15 @@ export default function App() {
       <main className="min-h-screen">
         <Outlet />
       </main>
-      <footer className="bg-gray-50 border-t border-gray-200 flex flex-row items-center justify-between">
-        <p className="text-gray-600 text-sm">
+      <footer className="container mx-auto border-t py-2 gap-2 border-gray-200 flex flex-col lg:flex-row items-center justify-between">
+        <p className="text-gray-900 text-sm">
           © {new Date().getFullYear()} VitalLab Medical. All rights reserved.
         </p>
-        <p className="text-gray-600 text-sm">
+        <p className="text-sm">
           Developed by{" "}
           <a
-            href="https://www.didar.dev/"
-            className="text-blue-600 hover:text-blue-700"
+            href="https://www.didar.dev"
+            className="text-blue-800 hover:text-blue-900 underline focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Didar.dev
           </a>

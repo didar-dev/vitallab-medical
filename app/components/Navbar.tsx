@@ -52,7 +52,7 @@ export function Navbar() {
                 onClick={closeMenu}
               >
                 <img
-                  src="/logo.jpg"
+                  src="/logo.webp"
                   alt="VitalLab Medical"
                   className="h-16 lg:h-16 object-contain"
                 />
