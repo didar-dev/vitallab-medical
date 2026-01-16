@@ -42,7 +42,7 @@ export function Navbar() {
         }`}
         aria-label="Main navigation"
       >
-        <div className="container mx-auto">
+        <div className="container mx-auto w-[95%] lg:w-full">
           <div className="flex justify-between items-center h-16">
             <div className="shrink-0">
               <Link

@@ -15,16 +15,16 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   return (
     <>
-      <section
-        style={{
-          backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/assets/backgrounds/home-hero.webp')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        className="container h-[50vh] w-[95%] lg:w-full mx-auto px-4 sm:px-6 lg:px-8 rounded-2xl mt-5 text-white py-20"
-      >
-        <div className="container h-full mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="container h-[50vh] w-[95%] lg:w-full mx-auto px-4 sm:px-6 lg:px-8 rounded-2xl mt-5 text-white py-20 relative overflow-hidden">
+        <img
+          src="/assets/backgrounds/home-hero.webp"
+          alt="VitalLab Medical"
+          className="absolute inset-0 w-full h-full object-cover"
+          fetchPriority="high"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="container h-full mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-3xl h-full mx-auto text-center flex flex-col justify-center">
             <h1 className="text-4xl sm:text-5xl lg:text-5xl font-bold mb-6">
               Welcome to VitalLab Medical
