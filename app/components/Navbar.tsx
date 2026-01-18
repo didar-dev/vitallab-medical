@@ -1,10 +1,17 @@
 import { Link } from "react-router";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,14 +21,6 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
 
   const pages = [
     {
@@ -49,7 +48,6 @@ export function Navbar() {
                 to="/"
                 className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
                 aria-label="Home page"
-                onClick={closeMenu}
               >
                 <img
                   src="/logo.webp"
@@ -73,41 +71,34 @@ export function Navbar() {
               ))}
             </ul>
 
-            {/* Mobile Menu Button */}
-            <button
-              type="button"
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
-              aria-controls="mobile-menu"
-              aria-expanded={isMenuOpen}
-              aria-label="Toggle navigation menu"
-              onClick={toggleMenu}
-            >
-              <span className="sr-only">Open main menu</span>
-              {!isMenuOpen ? (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <X className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
+            {/* Mobile Menu Sheet */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild className="md:hidden">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
+                  aria-label="Toggle navigation menu"
+                >
+                  <span className="sr-only">Open main menu</span>
+                  <Menu className="block h-6 w-6" aria-hidden="true" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] sm:w-[350px]">
+                <nav className="flex flex-col gap-2 mt-6">
+                  {pages.map((page) => (
+                    <Link
+                      key={page.path}
+                      to={page.path}
+                      className="text-lg font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-md transition-colors focus:outline-none"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {page.name}
+                    </Link>
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
-
-          {/* Mobile Navigation Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden" id="mobile-menu">
-              <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-200">
-                {pages.map((page) => (
-                  <Link
-                    to={page.path}
-                    className="nav-link block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors focus:outline-none"
-                    onClick={closeMenu}
-                    key={page.path}
-                  >
-                    {page.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </nav>
     </header>
