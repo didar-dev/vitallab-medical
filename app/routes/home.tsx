@@ -6,12 +6,10 @@ import ProductsSection from "../components/home/ProductsSection";
 import ProductsSkeleton from "../components/home/ProductsSkeleton";
 import { fetchProductsData, type ProductsData } from "../lib/products";
 
-const SIMULATED_DELAY = 3000; // ms
-
 export async function loader() {
   // Stream products data - returns promise without awaiting to unblock UI rendering
   const productsDataPromise = new Promise<ProductsData>((resolve) =>
-    setTimeout(() => resolve(fetchProductsData()), SIMULATED_DELAY)
+    resolve(fetchProductsData())
   );
 
   return { productsDataPromise };

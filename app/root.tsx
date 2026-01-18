@@ -5,11 +5,21 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
+import { fetchCategoriesData, type Category } from "./lib/categories";
 
 import type { Route } from "./+types/root";
 import { Navbar } from "./components/Navbar";
 import "./app.css";
+export async function loader() {
+  // Stream products data - returns promise without awaiting to unblock UI rendering
+  const categoriesPromise = new Promise<Category[]>((resolve) =>
+    resolve(fetchCategoriesData())
+  );
+
+  return categoriesPromise;
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -45,9 +55,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const categories = useLoaderData<typeof loader>();
+
   return (
     <>
-      <Navbar />
+      <Navbar categories={categories} />
       <main className="min-h-screen">
         <Outlet />
       </main>

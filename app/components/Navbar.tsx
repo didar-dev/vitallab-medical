@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useState, useEffect } from "react";
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -8,10 +8,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "~/components/ui/sheet";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card";
+import type { Category } from "~/lib/categories";
 
-export function Navbar() {
+export function Navbar({ categories }: { categories: Category[] }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,14 +29,31 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const pages = [
+  const navigationItems = [
     {
       name: "Home",
       path: "/",
     },
     {
-      name: "About",
+      name: "About Us",
       path: "/about",
+    },
+    {
+      name: "Products",
+      path: "/products",
+      isDropdown: true,
+    },
+    {
+      name: "News & Events",
+      path: "/news",
+    },
+    {
+      name: "Knowledge & Education",
+      path: "/knowledge",
+    },
+    {
+      name: "Contact Us",
+      path: "/contact",
     },
   ];
 
@@ -58,15 +82,53 @@ export function Navbar() {
             </div>
 
             {/* Desktop Navigation */}
-            <ul className="hidden md:flex space-x-4 lg:space-x-8" role="list">
-              {pages.map((page) => (
-                <li key={page.path}>
-                  <Link
-                    to={page.path}
-                    className="nav-link text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors focus:outline-none"
-                  >
-                    {page.name}
-                  </Link>
+            <ul
+              className="hidden md:flex space-x-2 lg:space-x-4 items-center"
+              role="list"
+            >
+              {navigationItems.map((item) => (
+                <li key={item.path}>
+                  {item.isDropdown ? (
+                    <HoverCard openDelay={200}>
+                      <HoverCardTrigger asChild>
+                        <button className="nav-link text-gray-700 hover:text-gray-900 px-2 text-sm font-medium transition-colors focus:outline-none cursor-pointer flex items-center gap-1">
+                          {item.name}
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-[800px] p-6" align="start">
+                        <div className="grid grid-cols-3 gap-6">
+                          {categories?.length > 0 &&
+                            categories.map((category) => (
+                              <div key={category.id} className="space-y-2">
+                                <h3 className="font-semibold text-sm text-gray-900 mb-2">
+                                  {category.name}
+                                </h3>
+                                <ul className="space-y-1">
+                                  {category.subCategories.map((subCategory) => (
+                                    <li key={subCategory.id}>
+                                      <Link
+                                        to={`/products?category=${subCategory.id}`}
+                                        className="text-sm text-gray-600 hover:text-gray-900 hover:underline transition-colors block py-1"
+                                      >
+                                        {subCategory.name}
+                                      </Link>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  ) : (
+                    <Link
+                      to={item.path}
+                      className="nav-link text-gray-700 hover:text-gray-900 px-2 text-sm font-medium transition-colors focus:outline-none"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -83,17 +145,64 @@ export function Navbar() {
                   <Menu className="block h-6 w-6" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[280px] sm:w-[350px]">
-                <nav className="flex flex-col gap-2 mt-6">
-                  {pages.map((page) => (
-                    <Link
-                      key={page.path}
-                      to={page.path}
-                      className="text-lg font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-md transition-colors focus:outline-none"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {page.name}
-                    </Link>
+              <SheetContent
+                side="left"
+                className="w-[280px] sm:w-[350px] overflow-y-auto"
+              >
+                <nav className="flex flex-col gap-2 mt-6 pb-6">
+                  {navigationItems.map((item) => (
+                    <div key={item.path}>
+                      {item.isDropdown ? (
+                        <div>
+                          <button
+                            onClick={() => setProductsOpen(!productsOpen)}
+                            className="w-full text-left text-lg font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-md transition-colors focus:outline-none flex items-center justify-between"
+                          >
+                            {item.name}
+                            <ChevronDown
+                              className={`h-5 w-5 transition-transform ${
+                                productsOpen ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+                          {productsOpen && (
+                            <div className="mt-2 ml-4 space-y-4">
+                              {categories?.length > 0 &&
+                                categories.map((category) => (
+                                  <div key={category.id} className="space-y-2">
+                                    <h3 className="font-semibold text-sm text-gray-900 px-4">
+                                      {category.name}
+                                    </h3>
+                                    <ul className="space-y-1">
+                                      {category.subCategories.map(
+                                        (subCategory) => (
+                                          <li key={subCategory.id}>
+                                            <Link
+                                              to={`/products?category=${subCategory.id}`}
+                                              className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 block px-4 py-1.5 rounded-md transition-colors"
+                                              onClick={() => setIsOpen(false)}
+                                            >
+                                              {subCategory.name}
+                                            </Link>
+                                          </li>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <Link
+                          to={item.path}
+                          className="text-lg font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-md transition-colors focus:outline-none block"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      )}
+                    </div>
                   ))}
                 </nav>
               </SheetContent>
