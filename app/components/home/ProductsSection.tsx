@@ -23,9 +23,7 @@ export default function ProductsSection({
   brands,
   productsByBrand,
 }: ProductsSectionProps) {
-  const [selectedBrandId, setSelectedBrandId] = useState(
-    brands[0]?.id || ""
-  );
+  const [selectedBrandId, setSelectedBrandId] = useState(brands[0]?.id || "");
 
   const currentProducts = productsByBrand[selectedBrandId] || [];
   const hasBrands = brands.length > 0;
@@ -35,7 +33,7 @@ export default function ProductsSection({
     <section className="py-16 bg-white w-full">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <SectionHeader />
-        
+
         {hasBrands && (
           <BrandSelector
             brands={brands}
@@ -141,12 +139,14 @@ function ProductCard({ product, animationDelay }: ProductCardProps) {
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       <div className="aspect-square overflow-hidden bg-gray-100">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          loading="lazy"
-        />
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        )}
       </div>
 
       <div className="p-4">
