@@ -47,20 +47,6 @@ export default function About() {
                 </p>
               </section>
 
-              <section className="mb-12">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                  Contact Us
-                </h2>
-                <p className="text-gray-700 leading-relaxed">
-                  For inquiries, please reach us at:{" "}
-                  <a
-                    href="mailto:sales@vitallab-medical.com"
-                    className="text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    sales@vitallab-medical.com
-                  </a>
-                </p>
-              </section>
             </article>
           </div>
         </div>
