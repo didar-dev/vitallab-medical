@@ -67,7 +67,7 @@ export default function App() {
         <p className="text-gray-900 text-sm">
           © {new Date().getFullYear()} VitalLab Medical. All rights reserved.
         </p>
-        <p className="text-sm">
+        {/* <p className="text-sm">
           Developed by{" "}
           <a
             href="https://www.didar.dev"
@@ -75,7 +75,7 @@ export default function App() {
           >
             Didar.dev
           </a>
-        </p>
+        </p> */}
       </footer>
     </>
   );
