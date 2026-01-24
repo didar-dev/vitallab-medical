@@ -43,14 +43,14 @@ export function Navbar({ categories }: { categories: Category[] }) {
       path: "/products",
       isDropdown: true,
     },
-    {
-      name: "News & Events",
-      path: "/news",
-    },
-    {
-      name: "Knowledge & Education",
-      path: "/knowledge",
-    },
+    // {
+    //   name: "News & Events",
+    //   path: "/news",
+    // },
+    // {
+    //   name: "Knowledge & Education",
+    //   path: "/knowledge",
+    // },
     {
       name: "Contact Us",
       path: "/contact",
@@ -60,9 +60,8 @@ export function Navbar({ categories }: { categories: Category[] }) {
   return (
     <header className="sticky top-0 z-50">
       <nav
-        className={`bg-white transition-shadow duration-300 ${
-          isScrolled ? "border-b border-gray-200 shadow-md" : ""
-        }`}
+        className={`bg-white transition-shadow duration-300 ${isScrolled ? "border-b border-gray-200 shadow-md" : ""
+          }`}
         aria-label="Main navigation"
       >
         <div className="container mx-auto w-[95%] lg:w-full">
@@ -160,9 +159,8 @@ export function Navbar({ categories }: { categories: Category[] }) {
                           >
                             {item.name}
                             <ChevronDown
-                              className={`h-5 w-5 transition-transform ${
-                                productsOpen ? "rotate-180" : ""
-                              }`}
+                              className={`h-5 w-5 transition-transform ${productsOpen ? "rotate-180" : ""
+                                }`}
                             />
                           </button>
                           {productsOpen && (
