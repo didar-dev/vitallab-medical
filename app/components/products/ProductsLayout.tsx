@@ -34,7 +34,7 @@ export function ProductsLayout({
 }: ProductsLayoutProps) {
   return (
     <section className="py-8 bg-white w-full">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-0">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Web: left sidebar — filters as div, never in sheet */}
           <aside className="hidden lg:block w-64 shrink-0 border-r border-gray-200 pr-6">
