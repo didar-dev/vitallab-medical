@@ -1,4 +1,4 @@
-import { useOutletContext } from "react-router";
+import { useOutletContext, Link } from "react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Product } from "~/lib/products";
 import type { ProductsOutletContext } from "./layout";
@@ -49,11 +49,7 @@ interface ProductsGridProps {
   hasProducts: boolean;
 }
 
-function ProductsGrid({
-  products,
-  brandMap,
-  hasProducts,
-}: ProductsGridProps) {
+function ProductsGrid({ products, brandMap, hasProducts }: ProductsGridProps) {
   if (!hasProducts) return null;
 
   return (
@@ -79,14 +75,10 @@ function ProductCard({
   brandName: string;
   animationDelay: number;
 }) {
-  const formattedDate = new Date(product.createdAt).toLocaleDateString(
-    "en-US",
-    { month: "short", day: "numeric", year: "numeric" }
-  );
-
   return (
-    <div
-      className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-200"
+    <Link
+      to={`/products/${product.id}`}
+      className="block bg-white border border-gray-200 hover:border-gray-300 transition-all duration-200"
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       <div className="aspect-square overflow-hidden bg-gray-100">
@@ -109,10 +101,11 @@ function ProductCard({
             {brandName}
           </p>
         )}
-        <h3 className="text-lg font-medium text-gray-900 mb-1">{product.name}</h3>
-        <p className="text-sm text-gray-500">{formattedDate}</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-1">
+          {product.name}
+        </h3>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -146,7 +139,7 @@ function Pagination({
             "p-2 rounded-md border transition-colors",
             page <= 1
               ? "border-gray-200 text-gray-400 cursor-not-allowed"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50",
           )}
           aria-label="Previous page"
         >
@@ -163,7 +156,7 @@ function Pagination({
             "p-2 rounded-md border transition-colors",
             page >= totalPages
               ? "border-gray-200 text-gray-400 cursor-not-allowed"
-              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+              : "border-gray-300 text-gray-700 hover:bg-gray-50",
           )}
           aria-label="Next page"
         >

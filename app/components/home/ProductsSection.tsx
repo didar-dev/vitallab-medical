@@ -124,15 +124,6 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product, animationDelay }: ProductCardProps) {
-  const formattedDate = new Date(product.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }
-  );
-
   return (
     <div
       className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-200"
@@ -153,7 +144,6 @@ function ProductCard({ product, animationDelay }: ProductCardProps) {
         <h3 className="text-lg font-medium text-gray-900 mb-1">
           {product.name}
         </h3>
-        <p className="text-sm text-gray-500">{formattedDate}</p>
       </div>
     </div>
   );

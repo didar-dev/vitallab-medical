@@ -1,10 +1,17 @@
 import type { Route } from "./+types/layout";
-import { useLoaderData, useSearchParams, Outlet } from "react-router";
+import {
+  useLoaderData,
+  useSearchParams,
+  useNavigation,
+  Outlet,
+} from "react-router";
 import { useMemo, useState } from "react";
 import { fetchProductsData, type Product } from "~/lib/products";
 import { fetchCategoriesData } from "~/lib/categories";
 import { ProductsLayout } from "~/components/products/ProductsLayout";
 import { ProductsFilters } from "~/components/products/ProductsFilters";
+import { ProductsContentSkeleton } from "~/components/products/ProductsContentSkeleton";
+import { ProductDetailSkeleton } from "~/components/products/ProductDetailSkeleton";
 
 const PAGE_SIZE = 12;
 
@@ -14,7 +21,8 @@ function toParams(updates: {
   page?: number;
 }): Record<string, string | string[]> {
   const r: Record<string, string | string[]> = {};
-  if (updates.category && updates.category.length > 0) r.category = updates.category;
+  if (updates.category && updates.category.length > 0)
+    r.category = updates.category;
   if (updates.brand && updates.brand.length > 0) r.brand = updates.brand;
   if (updates.page != null && updates.page > 1) r.page = String(updates.page);
   return r;
@@ -22,11 +30,16 @@ function toParams(updates: {
 
 function mergeParams(
   prev: URLSearchParams,
-  updates: { category?: string[]; brand?: string[]; page?: number }
+  updates: { category?: string[]; brand?: string[]; page?: number },
 ): Record<string, string | string[]> {
-  const category = updates.category !== undefined ? updates.category : prev.getAll("category");
-  const brand = updates.brand !== undefined ? updates.brand : prev.getAll("brand");
-  const page = updates.page !== undefined ? updates.page : Math.max(1, parseInt(prev.get("page") || "1", 10) || 1);
+  const category =
+    updates.category !== undefined ? updates.category : prev.getAll("category");
+  const brand =
+    updates.brand !== undefined ? updates.brand : prev.getAll("brand");
+  const page =
+    updates.page !== undefined
+      ? updates.page
+      : Math.max(1, parseInt(prev.get("page") || "1", 10) || 1);
   return toParams({ category, brand, page });
 }
 
@@ -63,10 +76,27 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+export function shouldRevalidate({
+  currentUrl,
+  nextUrl,
+  defaultShouldRevalidate,
+}: {
+  currentUrl: URL;
+  nextUrl: URL;
+  defaultShouldRevalidate: boolean;
+}) {
+  if (currentUrl.pathname === nextUrl.pathname) return false;
+  return defaultShouldRevalidate;
+}
+
 export default function ProductsLayoutRoute() {
   const { products, brands, categories } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigation = useNavigation();
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const isLoading = navigation.state === "loading";
+  const isNavigatingToProduct =
+    navigation.location?.pathname?.match(/^\/products\/[^/]+$/) ?? false;
 
   const selectedCategoryIds = searchParams.getAll("category");
   const selectedBrandIds = searchParams.getAll("brand");
@@ -86,8 +116,11 @@ export default function ProductsLayoutRoute() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = useMemo(
     () =>
-      filtered.slice((page - 1) * PAGE_SIZE, (page - 1) * PAGE_SIZE + PAGE_SIZE),
-    [filtered, page]
+      filtered.slice(
+        (page - 1) * PAGE_SIZE,
+        (page - 1) * PAGE_SIZE + PAGE_SIZE,
+      ),
+    [filtered, page],
   );
 
   const toggleCategory = (id: string) => {
@@ -95,7 +128,7 @@ export default function ProductsLayoutRoute() {
       ? selectedCategoryIds.filter((x) => x !== id)
       : [...selectedCategoryIds, id];
     setSearchParams((prev) =>
-      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 })
+      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 }),
     );
   };
 
@@ -104,13 +137,17 @@ export default function ProductsLayoutRoute() {
       ? selectedBrandIds.filter((x) => x !== id)
       : [...selectedBrandIds, id];
     setSearchParams((prev) =>
-      mergeParams(prev, { category: selectedCategoryIds, brand: next, page: 1 })
+      mergeParams(prev, {
+        category: selectedCategoryIds,
+        brand: next,
+        page: 1,
+      }),
     );
   };
 
   const clearFilters = () => {
     setSearchParams((prev) =>
-      mergeParams(prev, { category: [], brand: [], page: 1 })
+      mergeParams(prev, { category: [], brand: [], page: 1 }),
     );
   };
 
@@ -122,7 +159,7 @@ export default function ProductsLayoutRoute() {
     selectedCategoryIds.length > 0 || selectedBrandIds.length > 0;
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map((b) => [b.id, b.name])),
-    [brands]
+    [brands],
   );
 
   const filters = (
@@ -138,6 +175,27 @@ export default function ProductsLayoutRoute() {
     />
   );
 
+  const content = isLoading ? (
+    isNavigatingToProduct ? (
+      <ProductDetailSkeleton />
+    ) : (
+      <ProductsContentSkeleton />
+    )
+  ) : (
+    <Outlet
+      context={{
+        paginated,
+        totalPages,
+        page,
+        setPage,
+        total: filtered.length,
+        brandMap,
+        hasProducts: filtered.length > 0,
+        pageSize: PAGE_SIZE,
+      }}
+    />
+  );
+
   return (
     <ProductsLayout
       filters={filters}
@@ -147,18 +205,7 @@ export default function ProductsLayoutRoute() {
       activeFiltersCount={selectedCategoryIds.length + selectedBrandIds.length}
       title="Products"
     >
-      <Outlet
-        context={{
-          paginated,
-          totalPages,
-          page,
-          setPage,
-          total: filtered.length,
-          brandMap,
-          hasProducts: filtered.length > 0,
-          pageSize: PAGE_SIZE,
-        }}
-      />
+      {content}
     </ProductsLayout>
   );
 }
