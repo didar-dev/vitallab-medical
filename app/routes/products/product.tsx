@@ -47,6 +47,18 @@ export function meta({ data }: Route.MetaArgs) {
       name: "description",
       content: `Product: ${data.product.name}${data.brandName ? ` by ${data.brandName}` : ""}.`,
     },
+    data?.product?.image && {
+      name: "og:image",
+      content: `${import.meta.env.VITE_API_URL}/assets/${data?.product?.image}`,
+    },
+    data?.product?.image && {
+      name: "twitter:image",
+      content: `${import.meta.env.VITE_API_URL}/assets/${data?.product?.image}`,
+    },
+    data?.product?.image && {
+      name: "twitter:card",
+      content: "summary_large_image",
+    },
   ];
 }
 
