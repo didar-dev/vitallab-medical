@@ -7,7 +7,10 @@ import {
 } from "react-router";
 import { useMemo, useState } from "react";
 import { fetchProductsData, type Product } from "~/lib/products";
-import { fetchCategoriesData } from "~/lib/categories";
+import {
+  transformCategoriesFromApi,
+  type CategoriesApiResponse,
+} from "~/lib/categories";
 import { ProductsLayout } from "~/components/products/ProductsLayout";
 import { ProductsFilters } from "~/components/products/ProductsFilters";
 import { ProductsContentSkeleton } from "~/components/products/ProductsContentSkeleton";
@@ -30,7 +33,7 @@ function toParams(updates: {
 
 function mergeParams(
   prev: URLSearchParams,
-  updates: { category?: string[]; brand?: string[]; page?: number },
+  updates: { category?: string[]; brand?: string[]; page?: number }
 ): Record<string, string | string[]> {
   const category =
     updates.category !== undefined ? updates.category : prev.getAll("category");
@@ -55,14 +58,19 @@ export interface ProductsOutletContext {
 }
 
 export async function loader() {
-  const [productsData, categories] = await Promise.all([
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const [productsData, categoriesRes] = await Promise.all([
     fetchProductsData(),
-    fetchCategoriesData(),
+    fetch(`${apiUrl}/items/Categories`).then(async (r) => {
+      if (!r.ok) throw new Error("Failed to fetch categories");
+      return r.json() as Promise<CategoriesApiResponse>;
+    }),
   ]);
+  const categories = transformCategoriesFromApi(categoriesRes);
   return {
     products: productsData.products,
     brands: productsData.brands,
-    categories: categories || [],
+    categories,
   };
 }
 
@@ -118,9 +126,9 @@ export default function ProductsLayoutRoute() {
     () =>
       filtered.slice(
         (page - 1) * PAGE_SIZE,
-        (page - 1) * PAGE_SIZE + PAGE_SIZE,
+        (page - 1) * PAGE_SIZE + PAGE_SIZE
       ),
-    [filtered, page],
+    [filtered, page]
   );
 
   const toggleCategory = (id: string) => {
@@ -128,7 +136,7 @@ export default function ProductsLayoutRoute() {
       ? selectedCategoryIds.filter((x) => x !== id)
       : [...selectedCategoryIds, id];
     setSearchParams((prev) =>
-      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 }),
+      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 })
     );
   };
 
@@ -141,13 +149,13 @@ export default function ProductsLayoutRoute() {
         category: selectedCategoryIds,
         brand: next,
         page: 1,
-      }),
+      })
     );
   };
 
   const clearFilters = () => {
     setSearchParams((prev) =>
-      mergeParams(prev, { category: [], brand: [], page: 1 }),
+      mergeParams(prev, { category: [], brand: [], page: 1 })
     );
   };
 
@@ -159,7 +167,7 @@ export default function ProductsLayoutRoute() {
     selectedCategoryIds.length > 0 || selectedBrandIds.length > 0;
   const brandMap = useMemo(
     () => Object.fromEntries(brands.map((b) => [b.id, b.name])),
-    [brands],
+    [brands]
   );
 
   const filters = (
@@ -175,12 +183,12 @@ export default function ProductsLayoutRoute() {
     />
   );
 
+  if (isLoading && isNavigatingToProduct) {
+    return <ProductDetailSkeleton />;
+  }
+
   const content = isLoading ? (
-    isNavigatingToProduct ? (
-      <ProductDetailSkeleton />
-    ) : (
-      <ProductsContentSkeleton />
-    )
+    <ProductsContentSkeleton />
   ) : (
     <Outlet
       context={{

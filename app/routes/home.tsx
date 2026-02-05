@@ -1,18 +1,21 @@
 import type { Route } from "./+types/home";
-import { useLoaderData, Await } from "react-router";
-import { Suspense } from "react";
+import { useLoaderData } from "react-router";
 import { Briefcase, Shield, HeadphonesIcon, DollarSign } from "lucide-react";
 import ProductsSection from "../components/home/ProductsSection";
-import ProductsSkeleton from "../components/home/ProductsSkeleton";
-import { fetchProductsData, type ProductsData } from "../lib/products";
+import { fetchProductsData, type Product } from "../lib/products";
 
 export async function loader() {
-  // Stream products data - returns promise without awaiting to unblock UI rendering
-  const productsDataPromise = new Promise<ProductsData>((resolve) =>
-    resolve(fetchProductsData())
-  );
+  const { products, brands } = await fetchProductsData();
 
-  return { productsDataPromise };
+  const productsByBrand: Record<string, Product[]> = {};
+  for (const product of products) {
+    if (!productsByBrand[product.brandId]) {
+      productsByBrand[product.brandId] = [];
+    }
+    productsByBrand[product.brandId].push(product);
+  }
+
+  return { brands, productsByBrand };
 }
 
 export function meta({}: Route.MetaArgs) {
@@ -62,23 +65,13 @@ const FEATURES = [
 ] as const;
 
 export default function Home() {
-  const { productsDataPromise } = useLoaderData<typeof loader>();
+  const { brands, productsByBrand } = useLoaderData<typeof loader>();
 
   return (
     <>
       <HeroSection />
       <FeaturesSection />
-
-      <Suspense fallback={<ProductsSkeleton />}>
-        <Await resolve={productsDataPromise}>
-          {(data) => (
-            <ProductsSection
-              brands={data?.brands || []}
-              productsByBrand={data?.productsByBrand || {}}
-            />
-          )}
-        </Await>
-      </Suspense>
+      <ProductsSection brands={brands} productsByBrand={productsByBrand} />
     </>
   );
 }

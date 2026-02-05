@@ -1,18 +1,6 @@
 import { useState } from "react";
-
-interface Product {
-  id: string;
-  name: string;
-  image: string;
-  brandId: string;
-  categoryId: string;
-  createdAt: string;
-}
-
-interface Brand {
-  id: string;
-  name: string;
-}
+import { Link } from "react-router";
+import type { Product, Brand } from "~/lib/products";
 
 interface ProductsSectionProps {
   brands: Brand[];
@@ -125,18 +113,23 @@ interface ProductCardProps {
 
 function ProductCard({ product, animationDelay }: ProductCardProps) {
   return (
-    <div
-      className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-200"
+    <Link
+      to={`/products/${product.id}`}
+      className="block bg-white border border-gray-200 hover:border-gray-300 transition-all duration-200"
       style={{ animationDelay: `${animationDelay}ms` }}
     >
-      <div className="aspect-square overflow-hidden bg-gray-100">
-        {product.image && (
+      <div className="aspect-square overflow-hidden bg-white">
+        {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            className="w-full p-4 h-full object-contain hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+            No image
+          </div>
         )}
       </div>
 
@@ -145,6 +138,6 @@ function ProductCard({ product, animationDelay }: ProductCardProps) {
           {product.name}
         </h3>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -2,13 +2,21 @@ import type { Route } from "./+types/product";
 import { useLoaderData, Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { fetchProductsData } from "~/lib/products";
-import { fetchCategoriesData } from "~/lib/categories";
+import {
+  transformCategoriesFromApi,
+  type CategoriesApiResponse,
+} from "~/lib/categories";
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const [productsData, categories] = await Promise.all([
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const [productsData, categoriesRes] = await Promise.all([
     fetchProductsData(),
-    fetchCategoriesData(),
+    fetch(`${apiUrl}/items/Categories`).then(async (r) => {
+      if (!r.ok) throw new Error("Failed to fetch categories");
+      return r.json() as Promise<CategoriesApiResponse>;
+    }),
   ]);
+  const categories = transformCategoriesFromApi(categoriesRes);
   const product = productsData.products.find((p) => p.id === params.productId);
   if (!product) {
     throw new Response("Product not found", { status: 404 });

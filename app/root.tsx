@@ -7,18 +7,21 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "react-router";
-import { fetchCategoriesData, type Category } from "./lib/categories";
+import {
+  transformCategoriesFromApi,
+  type Category,
+  type CategoriesApiResponse,
+} from "./lib/categories";
 
 import type { Route } from "./+types/root";
 import { Navbar } from "./components/Navbar";
 import "./app.css";
-export async function loader() {
-  // Stream products data - returns promise without awaiting to unblock UI rendering
-  const categoriesPromise = new Promise<Category[]>((resolve) =>
-    resolve(fetchCategoriesData())
-  );
 
-  return categoriesPromise;
+export async function loader(): Promise<Category[]> {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/items/Categories`);
+  if (!res.ok) throw new Error("Failed to fetch categories");
+  const json: CategoriesApiResponse = await res.json();
+  return transformCategoriesFromApi(json);
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
