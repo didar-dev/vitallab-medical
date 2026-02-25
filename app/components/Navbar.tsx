@@ -98,11 +98,22 @@ export function Navbar({ categories }: { categories: Category[] }) {
                       <HoverCardContent className="w-[800px] p-6" align="start">
                         <div className="grid grid-cols-3 gap-6">
                           {categories?.length > 0 &&
-                            categories.map((category) => (
+                            categories.map((category) => {
+                              const subIds =
+                                category.subCategories.length > 0
+                                  ? category.subCategories.map((s) => s.id)
+                                  : [category.id];
+                              const categoryQuery = subIds
+                                .map((id) => `category=${id}`)
+                                .join("&");
+                              return (
                               <div key={category.id} className="space-y-2">
-                                <h3 className="font-semibold text-sm text-gray-900 mb-2">
+                                <Link
+                                  to={`/products?${categoryQuery}`}
+                                  className="font-semibold text-sm text-gray-900 mb-2 hover:text-gray-700 hover:underline block"
+                                >
                                   {category.name}
-                                </h3>
+                                </Link>
                                 <ul className="space-y-1">
                                   {category.subCategories.map((subCategory) => (
                                     <li key={subCategory.id}>
@@ -116,7 +127,8 @@ export function Navbar({ categories }: { categories: Category[] }) {
                                   ))}
                                 </ul>
                               </div>
-                            ))}
+                            );
+                            })}
                         </div>
                       </HoverCardContent>
                     </HoverCard>
@@ -163,14 +175,26 @@ export function Navbar({ categories }: { categories: Category[] }) {
                                 }`}
                             />
                           </button>
-                          {productsOpen && (
+                            {productsOpen && (
                             <div className="mt-2 ml-4 space-y-4">
                               {categories?.length > 0 &&
-                                categories.map((category) => (
+                                categories.map((category) => {
+                                  const subIds =
+                                    category.subCategories.length > 0
+                                      ? category.subCategories.map((s) => s.id)
+                                      : [category.id];
+                                  const categoryQuery = subIds
+                                    .map((id) => `category=${id}`)
+                                    .join("&");
+                                  return (
                                   <div key={category.id} className="space-y-2">
-                                    <h3 className="font-semibold text-sm text-gray-900 px-4">
+                                    <Link
+                                      to={`/products?${categoryQuery}`}
+                                      className="font-semibold text-sm text-gray-900 px-4 hover:text-gray-700 hover:bg-gray-50 block py-1.5 rounded-md transition-colors"
+                                      onClick={() => setIsOpen(false)}
+                                    >
                                       {category.name}
-                                    </h3>
+                                    </Link>
                                     <ul className="space-y-1">
                                       {category.subCategories.map(
                                         (subCategory) => (
@@ -187,7 +211,8 @@ export function Navbar({ categories }: { categories: Category[] }) {
                                       )}
                                     </ul>
                                   </div>
-                                ))}
+                                );
+                                })}
                             </div>
                           )}
                         </div>

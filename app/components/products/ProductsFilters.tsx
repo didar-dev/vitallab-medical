@@ -7,6 +7,7 @@ export interface ProductsFiltersProps {
   selectedCategoryIds: string[];
   selectedBrandIds: string[];
   onCategoryToggle: (id: string) => void;
+  onCategoryParentToggle: (category: Category) => void;
   onBrandToggle: (id: string) => void;
   onClear: () => void;
   hasActiveFilters: boolean;
@@ -18,6 +19,7 @@ export function ProductsFilters({
   selectedCategoryIds,
   selectedBrandIds,
   onCategoryToggle,
+  onCategoryParentToggle,
   onBrandToggle,
   onClear,
   hasActiveFilters,
@@ -40,13 +42,26 @@ export function ProductsFilters({
       <div>
         <h3 className="text-sm font-medium text-gray-900 mb-3">Category</h3>
         <div className="space-y-3">
-          {categories.map((cat) => (
+          {categories.map((cat) => {
+            const subIds = cat.subCategories.map((s) => s.id);
+            const parentChecked =
+              subIds.length > 0
+                ? subIds.every((id) => selectedCategoryIds.includes(id))
+                : selectedCategoryIds.includes(cat.id);
+            const parentIndeterminate =
+              subIds.length > 0 &&
+              subIds.some((id) => selectedCategoryIds.includes(id)) &&
+              !parentChecked;
+            return (
             <div key={cat.id} className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedCategoryIds.includes(cat.id)}
-                  onChange={() => onCategoryToggle(cat.id)}
+                  ref={(el) => {
+                    if (el) el.indeterminate = parentIndeterminate;
+                  }}
+                  checked={parentChecked}
+                  onChange={() => onCategoryParentToggle(cat)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">{cat.name}</span>
@@ -66,7 +81,8 @@ export function ProductsFilters({
                 </label>
               ))}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

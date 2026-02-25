@@ -140,6 +140,21 @@ export default function ProductsLayoutRoute() {
     );
   };
 
+  const toggleCategoryParent = (cat: (typeof categories)[0]) => {
+    const subIds = cat.subCategories.map((s) => s.id);
+    if (subIds.length === 0) {
+      toggleCategory(cat.id);
+      return;
+    }
+    const allSelected = subIds.every((id) => selectedCategoryIds.includes(id));
+    const next = allSelected
+      ? selectedCategoryIds.filter((x) => !subIds.includes(x))
+      : [...selectedCategoryIds, ...subIds.filter((id) => !selectedCategoryIds.includes(id))];
+    setSearchParams((prev) =>
+      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 })
+    );
+  };
+
   const toggleBrand = (id: string) => {
     const next = selectedBrandIds.includes(id)
       ? selectedBrandIds.filter((x) => x !== id)
@@ -177,6 +192,7 @@ export default function ProductsLayoutRoute() {
       selectedCategoryIds={selectedCategoryIds}
       selectedBrandIds={selectedBrandIds}
       onCategoryToggle={toggleCategory}
+      onCategoryParentToggle={toggleCategoryParent}
       onBrandToggle={toggleBrand}
       onClear={clearFilters}
       hasActiveFilters={hasActiveFilters}
