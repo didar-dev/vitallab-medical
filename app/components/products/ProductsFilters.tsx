@@ -1,5 +1,6 @@
 import type { Category } from "~/lib/categories";
 import type { Brand } from "~/lib/products";
+import { useEffect, useState } from "react";
 
 export interface ProductsFiltersProps {
   categories: Category[];
@@ -28,6 +29,22 @@ export function ProductsFilters({
   onClear,
   hasActiveFilters,
 }: ProductsFiltersProps) {
+  const [draftSearchValue, setDraftSearchValue] = useState(searchValue);
+
+  useEffect(() => {
+    setDraftSearchValue(searchValue);
+  }, [searchValue]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      if (draftSearchValue !== searchValue) {
+        onSearchChange(draftSearchValue);
+      }
+    }, 400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [draftSearchValue, onSearchChange, searchValue]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -49,8 +66,8 @@ export function ProductsFilters({
         </label>
         <input
           type="search"
-          value={searchValue}
-          onChange={(e) => onSearchChange(e.currentTarget.value)}
+          value={draftSearchValue}
+          onChange={(e) => setDraftSearchValue(e.currentTarget.value)}
           placeholder="Search by name, details, or brand"
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
         />
