@@ -22,18 +22,27 @@ function toParams(updates: {
   category?: string[];
   brand?: string[];
   page?: number;
+  search?: string;
 }): Record<string, string | string[]> {
   const r: Record<string, string | string[]> = {};
   if (updates.category && updates.category.length > 0)
     r.category = updates.category;
   if (updates.brand && updates.brand.length > 0) r.brand = updates.brand;
   if (updates.page != null && updates.page > 1) r.page = String(updates.page);
+  if (updates.search && updates.search.trim().length > 0) {
+    r.search = updates.search.trim();
+  }
   return r;
 }
 
 function mergeParams(
   prev: URLSearchParams,
-  updates: { category?: string[]; brand?: string[]; page?: number }
+  updates: {
+    category?: string[];
+    brand?: string[];
+    page?: number;
+    search?: string;
+  },
 ): Record<string, string | string[]> {
   const category =
     updates.category !== undefined ? updates.category : prev.getAll("category");
@@ -43,7 +52,9 @@ function mergeParams(
     updates.page !== undefined
       ? updates.page
       : Math.max(1, parseInt(prev.get("page") || "1", 10) || 1);
-  return toParams({ category, brand, page });
+  const search =
+    updates.search !== undefined ? updates.search : prev.get("search") || "";
+  return toParams({ category, brand, page, search });
 }
 
 export interface ProductsOutletContext {
@@ -108,7 +119,14 @@ export default function ProductsLayoutRoute() {
 
   const selectedCategoryIds = searchParams.getAll("category");
   const selectedBrandIds = searchParams.getAll("brand");
+  const searchTerm = searchParams.get("search") || "";
+  const hasSearch = searchTerm.trim().length > 0;
   const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10) || 1);
+  const brandMap = useMemo(
+    () => Object.fromEntries(brands.map((b) => [b.id, b.name])),
+    [brands],
+  );
+  const normalizedSearch = searchTerm.trim().toLowerCase();
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -117,18 +135,29 @@ export default function ProductsLayoutRoute() {
         selectedCategoryIds.includes(p.categoryId);
       const matchBrand =
         selectedBrandIds.length === 0 || selectedBrandIds.includes(p.brandId);
-      return matchCat && matchBrand;
+      const matchSearch =
+        !hasSearch ||
+        [p.name, p.details, brandMap[p.brandId]]
+          .filter(Boolean)
+          .some((value) => value!.toLowerCase().includes(normalizedSearch));
+      return matchCat && matchBrand && matchSearch;
     });
-  }, [products, selectedCategoryIds, selectedBrandIds]);
+  }, [
+    products,
+    selectedCategoryIds,
+    selectedBrandIds,
+    normalizedSearch,
+    brandMap,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = useMemo(
     () =>
       filtered.slice(
         (page - 1) * PAGE_SIZE,
-        (page - 1) * PAGE_SIZE + PAGE_SIZE
+        (page - 1) * PAGE_SIZE + PAGE_SIZE,
       ),
-    [filtered, page]
+    [filtered, page],
   );
 
   const toggleCategory = (id: string) => {
@@ -136,7 +165,7 @@ export default function ProductsLayoutRoute() {
       ? selectedCategoryIds.filter((x) => x !== id)
       : [...selectedCategoryIds, id];
     setSearchParams((prev) =>
-      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 })
+      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 }),
     );
   };
 
@@ -149,9 +178,12 @@ export default function ProductsLayoutRoute() {
     const allSelected = subIds.every((id) => selectedCategoryIds.includes(id));
     const next = allSelected
       ? selectedCategoryIds.filter((x) => !subIds.includes(x))
-      : [...selectedCategoryIds, ...subIds.filter((id) => !selectedCategoryIds.includes(id))];
+      : [
+          ...selectedCategoryIds,
+          ...subIds.filter((id) => !selectedCategoryIds.includes(id)),
+        ];
     setSearchParams((prev) =>
-      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 })
+      mergeParams(prev, { category: next, brand: selectedBrandIds, page: 1 }),
     );
   };
 
@@ -164,14 +196,28 @@ export default function ProductsLayoutRoute() {
         category: selectedCategoryIds,
         brand: next,
         page: 1,
-      })
+      }),
     );
   };
 
   const clearFilters = () => {
-    setSearchParams((prev) =>
-      mergeParams(prev, { category: [], brand: [], page: 1 })
-    );
+    setSearchParams(() => toParams({}));
+  };
+
+  const updateSearch = (value: string) => {
+    const nextSearch = value.trim();
+    setSearchParams((prev) => {
+      if (!nextSearch) {
+        return mergeParams(prev, { search: "", page: 1 });
+      }
+
+      const hasExistingSearch = (prev.get("search") || "").trim().length > 0;
+      if (!hasExistingSearch) {
+        return toParams({ search: nextSearch, page: 1 });
+      }
+
+      return mergeParams(prev, { search: nextSearch, page: 1 });
+    });
   };
 
   const setPage = (p: number) => {
@@ -179,11 +225,7 @@ export default function ProductsLayoutRoute() {
   };
 
   const hasActiveFilters =
-    selectedCategoryIds.length > 0 || selectedBrandIds.length > 0;
-  const brandMap = useMemo(
-    () => Object.fromEntries(brands.map((b) => [b.id, b.name])),
-    [brands]
-  );
+    selectedCategoryIds.length > 0 || selectedBrandIds.length > 0 || hasSearch;
 
   const filters = (
     <ProductsFilters
@@ -196,6 +238,8 @@ export default function ProductsLayoutRoute() {
       onBrandToggle={toggleBrand}
       onClear={clearFilters}
       hasActiveFilters={hasActiveFilters}
+      searchValue={searchTerm}
+      onSearchChange={updateSearch}
     />
   );
 
@@ -226,7 +270,11 @@ export default function ProductsLayoutRoute() {
       filtersOpen={filtersOpen}
       onFiltersOpenChange={setFiltersOpen}
       hasActiveFilters={hasActiveFilters}
-      activeFiltersCount={selectedCategoryIds.length + selectedBrandIds.length}
+      activeFiltersCount={
+        selectedCategoryIds.length +
+        selectedBrandIds.length +
+        (hasSearch ? 1 : 0)
+      }
       title="Products"
     >
       {content}
