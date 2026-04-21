@@ -1,22 +1,5 @@
 import type { Route } from "./+types/home";
-import { useLoaderData } from "react-router";
 import { Briefcase, Shield, HeadphonesIcon, DollarSign } from "lucide-react";
-import ProductsSection from "../components/home/ProductsSection";
-import { fetchProductsData, type Product } from "../lib/products";
-
-export async function loader() {
-  const { products, brands } = await fetchProductsData();
-
-  const productsByBrand: Record<string, Product[]> = {};
-  for (const product of products) {
-    if (!productsByBrand[product.brandId]) {
-      productsByBrand[product.brandId] = [];
-    }
-    productsByBrand[product.brandId].push(product);
-  }
-
-  return { brands, productsByBrand };
-}
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -65,13 +48,10 @@ const FEATURES = [
 ] as const;
 
 export default function Home() {
-  const { brands, productsByBrand } = useLoaderData<typeof loader>();
-
   return (
     <>
       <HeroSection />
       <FeaturesSection />
-      <ProductsSection brands={brands} productsByBrand={productsByBrand} />
     </>
   );
 }
